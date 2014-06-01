@@ -35,6 +35,7 @@
     <module>enterprise</module>
     <module>cypher-plugin</module>
     <module>gremlin-plugin</module>
+    <module>authentication-extension</module>
   </modules>
   
   <build>
