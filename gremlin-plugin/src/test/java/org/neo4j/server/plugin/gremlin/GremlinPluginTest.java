@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import junit.framework.Assert;
 
 import org.json.simple.JSONArray;
@@ -43,9 +45,9 @@ import org.neo4j.server.rest.repr.Representation;
 import org.neo4j.server.rest.repr.formats.JsonFormat;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 
 public class GremlinPluginTest
 {
@@ -53,6 +55,17 @@ public class GremlinPluginTest
     private static GremlinPlugin plugin = null;
     private static OutputFormat json = null;
     private static JSONParser parser = new JSONParser();
+
+    private static void clear(Graph graph) {
+        for (Edge edge : graph.getEdges()) {
+            graph.removeEdge(edge);
+        }
+        for (Vertex vertex : graph.getVertices()) {
+            graph.removeVertex(vertex);
+        }
+        if (graph instanceof TransactionalGraph)
+            ((TransactionalGraph) graph).commit();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
@@ -62,7 +75,7 @@ public class GremlinPluginTest
         neo4j = new ImpermanentGraphDatabase();
         plugin = new GremlinPlugin();
         Graph graph = new Neo4jGraph( neo4j );
-        graph.clear();
+        clear(graph);
         Vertex marko = graph.addVertex( "1" );
         marko.setProperty( "name", "marko" );
         marko.setProperty( "age", 29 );
